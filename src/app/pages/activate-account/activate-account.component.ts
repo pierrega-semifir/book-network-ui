@@ -1,0 +1,48 @@
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthenticationService } from '../../services/services';
+import { CodeInputModule } from 'angular-code-input';
+
+@Component({
+  selector: 'app-activate-account',
+  standalone: true,
+  imports: [CodeInputModule],
+  templateUrl: './activate-account.component.html',
+  styleUrl: './activate-account.component.scss'
+})
+export class ActivateAccountComponent {
+
+  message: string = '';
+  isOkay: boolean = true;
+  submitted: boolean = false;
+
+  constructor(
+    private router: Router, 
+    private authService: AuthenticationService) {
+    
+  }
+
+  onCodeCompleted(token:string) {
+    this.confirmAccount(token);
+  }
+
+  confirmAccount(token: string){
+    this.authService.confirm({token}).subscribe({
+        next: () => {
+          this.message = 'Votre compte a été activé avec succès.\nVous pouvez maintenant vous connecter.';
+          this.submitted = true;
+          this.isOkay = true;
+      },
+      error: () => {
+        this.message = 'Une erreur est survenue lors de l\'activation de votre compte.\nVeuillez réessayer.';
+        this.submitted = true;
+        this.isOkay = false;
+      }
+    });
+  }
+
+  redirectToLogin(){
+    this.router.navigate(['login']);
+  }
+
+}
